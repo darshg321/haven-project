@@ -12,11 +12,9 @@ Sky: Low Poly Kloofendal 48d Partly Cloudy (Pure Sky): https://polyhaven.com/a/k
 
 Font: Barlow Bold by Jeremy Tribby: https://github.com/jpt/barlow (also on https://fonts.google.com/specimen/Barlow)
 
-Ability icons: duiker101: https://github.com/duiker101/pokemon-type-svg-icons
+Water shuriken texture: "Sharp shuriken" by Darkzaitzev: https://game-icons.net
 
-Water shuriken texture: "Sharp shuriken" by Darkzaitzev, game-icons.net, CC BY 3.0: https://game-icons.net
-
-Sound effects (all CC0, details in Assets/Art/SOURCES.md):
+Sound effects:
 - Shuriken throw: Kenney, RPG Audio
 - Shuriken hit and wall: "40 CC0 water splash / slime SFX" (OpenGameArt)
 - Ember cast: Julien Matthey, "JM FX Fireball 01" (OpenGameArt)
@@ -24,8 +22,6 @@ Sound effects (all CC0, details in Assets/Art/SOURCES.md):
 - Hitmarker, countdown, fight, round win/lose, KO: Kenney, Interface Sounds
 
 Pokemon cries: Pokemon Showdown
-
-Ability circle: Kenney UI Pack: https://kenney.nl/assets/ui-pack
 
 # Running it
 Open the project in Unity 6.3 and play `Assets/Scenes/LanHaven.unity`. Pick a Pokemon, a site and the bot, then Fight.
