@@ -8,11 +8,11 @@ Greninja: https://skfb.ly/pBn7s
 
 Charizard: "Shiny Charizard (Official)" by Mariokart07, CC BY 4.0: https://sketchfab.com/3d-models/shiny-charizard-official-265ec4a94c664e5eb10a238c93c44e55
 
-Sky: Poly Haven, "Kloofendal 48d Partly Cloudy (Pure Sky)", CC0: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+Sky: Low Poly Kloofendal 48d Partly Cloudy (Pure Sky): https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
 
-Font: Barlow Bold by Jeremy Tribby, SIL OFL 1.1: https://github.com/jpt/barlow (also on https://fonts.google.com/specimen/Barlow)
+Font: Barlow Bold by Jeremy Tribby: https://github.com/jpt/barlow (also on https://fonts.google.com/specimen/Barlow)
 
-Ability icons: duiker101, "pokemon-type-svg-icons": https://github.com/duiker101/pokemon-type-svg-icons
+Ability icons: duiker101: https://github.com/duiker101/pokemon-type-svg-icons
 
 Water shuriken texture: "Sharp shuriken" by Darkzaitzev, game-icons.net, CC BY 3.0: https://game-icons.net
 
@@ -25,12 +25,12 @@ Sound effects (all CC0, details in Assets/Art/SOURCES.md):
 
 Pokemon cries: Pokemon Showdown
 
-Ability circle: Kenney UI Pack (button_round_flat), CC0: https://kenney.nl/assets/ui-pack
+Ability circle: Kenney UI Pack: https://kenney.nl/assets/ui-pack
 
 # Running it
 Open the project in Unity 6.3 and play `Assets/Scenes/LanHaven.unity`. Pick a Pokemon, a site and the bot, then Fight.
 
-For online matches run the relay (`pip install websockets`, then `python3 Tools/relay_server.py`) and pick Online.
-It also serves `builds/webgl` on port 8000, so people on the same wifi can open the game there.
+Online matches go through the public relay on Cloudflare (`Tools/relay-worker`, deploy with `npx wrangler deploy`), so just pick Online and the same site.
+For offline testing, `python3 Tools/relay_server.py` runs the same relay locally and serves `builds/webgl` on port 8000.
 
 WebGL build for itch.io: **HavenDuel > Build WebGL** (or `unity build . --target WebGL --execute-method WebBuild.Build -o builds/webgl`).
