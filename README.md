@@ -22,11 +22,3 @@ Sound effects:
 - Hitmarker, countdown, fight, round win/lose, KO: Kenney, Interface Sounds
 
 Pokemon cries: Pokemon Showdown
-
-# Running it
-Open the project in Unity 6.3 and play `Assets/Scenes/LanHaven.unity`. Pick a Pokemon, a site and the bot, then Fight.
-
-Online matches go through the public relay on Cloudflare (`Tools/relay-worker`, deploy with `npx wrangler deploy`), so just pick Online and the same site.
-For offline testing, `python3 Tools/relay_server.py` runs the same relay locally and serves `builds/webgl` on port 8000.
-
-WebGL build for itch.io: **HavenDuel > Build WebGL** (or `unity build . --target WebGL --execute-method WebBuild.Build -o builds/webgl`).
