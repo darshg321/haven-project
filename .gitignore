@@ -47,3 +47,10 @@ crashlytics-build.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# rebuilt locally from Haven.blend; only the per-site bundles are committed
+/Assets/Models/Maps/haven_full.glb
+/Assets/Models/Maps/haven_full.glb.meta
+/Assets/Data/Sites/
+/Assets/Data/Sites.meta
+/Temp/

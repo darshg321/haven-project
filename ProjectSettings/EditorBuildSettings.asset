@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/LanHaven.unity
+    guid: 304fbeadaf13376c48be1ba2263e0377
+  - enabled: 1
+    path: Assets/Scenes/LanTest.unity
+    guid: 528d0be2c73b1e9b88a296151aacbccd
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:

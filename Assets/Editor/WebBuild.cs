@@ -25,6 +25,7 @@ public static class WebBuild
         var output = GetArg("-buildOutput") ?? DefaultOutput;
         Directory.CreateDirectory(output);
 
+        SiteBundles.BuildBundles(BuildTarget.WebGL);
         var scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
         var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions
         {

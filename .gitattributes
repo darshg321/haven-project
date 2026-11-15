@@ -1,0 +1,2 @@
+*.glb filter=lfs diff=lfs merge=lfs -text
+Assets/StreamingAssets/sites/site_* filter=lfs diff=lfs merge=lfs -text

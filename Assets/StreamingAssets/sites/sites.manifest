@@ -1,0 +1,15 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.3.28f1
+CRC: 1803688761
+HashAppended: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: site_a
+      Dependencies: {}
+    Info_1:
+      Name: site_b
+      Dependencies: {}
+    Info_2:
+      Name: site_c
+      Dependencies: {}

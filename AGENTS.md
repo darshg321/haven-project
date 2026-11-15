@@ -30,3 +30,8 @@
 ## Rules
 - Don't commit or push unless the user asks.
 - Close any Editor you opened when you finish (`unity close .`), unless the user wants it left open.
+
+## LAN multiplayer test
+- Scene `Assets/Scenes/LanTest.unity` (rebuild with **HavenDuel → Build LAN Test Scene**), first in the build list. Code in `Assets/Scripts/Net/`.
+- Relay: `python3 Tools/lan_server.py` (WebSocket :7777, also serves `builds/webgl` on :8000). Players on the same wifi open `http://<host LAN ip>:8000`.
+- ws:// only works from a page served over http, so this does not work from the https itch.io page.
