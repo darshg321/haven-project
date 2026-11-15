@@ -8,10 +8,10 @@ Greninja: https://skfb.ly/pBn7s
 
 Charizard: https://skfb.ly/pMLCQ
 
-Sky: Poly Haven, "Kloofendal 48d Partly Cloudy (Pure Sky)", CC0: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+Sky: Low Poly Kloofendal 48d Partly Cloudy (Pure Sky): https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
 
-Font: Barlow Bold by Jeremy Tribby, SIL OFL 1.1: https://github.com/jpt/barlow (also on https://fonts.google.com/specimen/Barlow)
+Font: Barlow Bold by Jeremy Tribby: https://github.com/jpt/barlow (also on https://fonts.google.com/specimen/Barlow)
 
-Ability icons: duiker101, "pokemon-type-svg-icons", MIT: https://github.com/duiker101/pokemon-type-svg-icons
+Ability icons: duiker101: https://github.com/duiker101/pokemon-type-svg-icons
 
-Ability circle: Kenney UI Pack (button_round_flat), CC0: https://kenney.nl/assets/ui-pack
+Ability circle: Kenney UI Pack: https://kenney.nl/assets/ui-pack
