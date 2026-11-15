@@ -1,3 +1,8 @@
 *.glb filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/sites/site_* filter=lfs diff=lfs merge=lfs -text
 MapSource/*.tar.gz filter=lfs diff=lfs merge=lfs -text
+
+# Keep Unity metadata and AssetBundle manifests as plain text, never LFS.
+# These must come after the LFS rules so they override them.
+*.meta -filter -diff -merge text
+Assets/StreamingAssets/sites/*.manifest -filter -diff -merge text

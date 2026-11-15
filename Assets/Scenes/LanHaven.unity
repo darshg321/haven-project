@@ -149,16 +149,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HavenDuel.Net.LanGame
   roster: {fileID: 11400000, guid: ab20ae7e48dc19d079e31b039b675ba2, type: 2}
+  combat: {fileID: 11400000, guid: 4fba23baeac1571b4abab4b6f505c0d2, type: 2}
   port: 7777
-  publicRelay: wss://flyingfish-pc.tail988c5f.ts.net:8443
+  publicRelay: wss://haven-relay.exam-reviews.workers.dev
   sendRate: 15
-  playerHeight: 1.4
-  map: {fileID: 0}
-  floorPrefix: Floor
-  siteCMap: {fileID: 0}
-  havenMap: {fileID: 0}
-  siteBundles: 1
-  cutMargin: 6
+  site: 2
 --- !u!4 &68526434
 Transform:
   m_ObjectHideFlags: 0

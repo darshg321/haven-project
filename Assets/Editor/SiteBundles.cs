@@ -1,163 +1,175 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HavenDuel.Net;
+using HavenDuel;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-/// Cuts the full Haven map into one prefab per site and builds each as its own asset bundle,
-/// so a player downloads only the site they pick.
 public static class SiteBundles
 {
     const string MapPath = "Assets/Models/Maps/haven_full.glb";
-    const string PrefabDir = "Assets/Data/Sites";
-    public const string BundleDir = "Assets/StreamingAssets/sites";
+    const string Dir = "Assets/Data/Sites";
+    const string BundleDir = "Assets/StreamingAssets/sites";
+
     static readonly string[] NoCollide = { "Canopy", "Leaves", "Leaf", "Foliage", "Bush", "Vine", "Ivy", "Flower", "Banner", "Cloth", "Outline", "Decal", "Lantern" };
+    static readonly string[] Cutout = { "Leaf", "Leaves", "Foliage", "Plant", "Tree", "Grass", "Vine", "Ivy", "Branch", "Decal", "Banner", "Flag", "Wires", "Cable" };
+    static readonly string[] Overlay = { "Decal", "Grime", "Dirt", "Stain", "Leak", "Damage", "Destruct", "Overlay", "Wet", "Moss", "Dust", "Crack", "Puddle", "Soot", "Burn", "Paint", "Mural", "Graffiti", "Blend" };
+    static readonly string[] Glow = { "RebelMetalCrates", "Glow", "Light", "Lamp", "Screen", "Emiss", "Neon", "Radianite", "Crystal" };
+
+    static readonly Dictionary<Material, Material> materials = new();
+    static readonly Dictionary<Texture, Texture2D> textures = new();
 
     [MenuItem("HavenDuel/Build Site Prefabs")]
     public static void BuildPrefabs()
     {
-        Directory.CreateDirectory(PrefabDir);
-        mats.Clear(); texs.Clear();
-        if (AssetDatabase.IsValidFolder(PrefabDir + "/Mat")) AssetDatabase.DeleteAsset(PrefabDir + "/Mat");
-        if (AssetDatabase.IsValidFolder(PrefabDir + "/Tex")) AssetDatabase.DeleteAsset(PrefabDir + "/Tex");
-        var src = AssetDatabase.LoadAssetAtPath<GameObject>(MapPath);
-        foreach (LanGame.Site site in System.Enum.GetValues(typeof(LanGame.Site)))
+        materials.Clear();
+        textures.Clear();
+        AssetDatabase.DeleteAsset(Dir + "/Mat");
+        AssetDatabase.DeleteAsset(Dir + "/Tex");
+        Directory.CreateDirectory(Dir + "/Mat");
+        Directory.CreateDirectory(Dir + "/Tex");
+        var full = AssetDatabase.LoadAssetAtPath<GameObject>(MapPath);
+
+        foreach (Site site in System.Enum.GetValues(typeof(Site)))
         {
-            var area = LanGame.Area(site);
+            var area = Map.Area(site);
             var keep = Rect.MinMaxRect(area.xMin - 3f, area.yMin - 3f, area.xMax + 3f, area.yMax + 3f);
-            var go = (GameObject)Object.Instantiate(src);
+            var go = Object.Instantiate(full);
             go.name = "Site" + site;
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
-                if (!r) continue;
-                var b = r.bounds;
-                // keep a piece only if its centre is in the site (touching the edge is not enough)
-                if (!keep.Contains(new Vector2(b.center.x, b.center.z)) || r.name.StartsWith("Floater")) { Object.DestroyImmediate(r.gameObject); continue; }
-                if (r.TryGetComponent<MeshFilter>(out var f) && f.sharedMesh && !NoCollide.Any(k => r.name.Contains(k)))
-                    r.gameObject.AddComponent<MeshCollider>();
+                var c = r.bounds.center;
+                if (!keep.Contains(new Vector2(c.x, c.z)) || r.name.StartsWith("Floater"))
+                    Object.DestroyImmediate(r.gameObject);
+                else
+                {
+                    if (!Has(r.name, NoCollide)) r.gameObject.AddComponent<MeshCollider>();
+                    r.sharedMaterials = r.sharedMaterials.Select(Convert).ToArray();
+                }
             }
-            // drop empty branches left behind
             foreach (var t in go.GetComponentsInChildren<Transform>(true).Reverse())
-                if (t && t != go.transform && t.childCount == 0 && !t.GetComponent<Renderer>()) Object.DestroyImmediate(t.gameObject);
-            foreach (var r in go.GetComponentsInChildren<Renderer>(true))
-                r.sharedMaterials = r.sharedMaterials.Select(CompressedMaterial).ToArray();
-            var path = $"{PrefabDir}/Site{site}.prefab";
+                if (t != go.transform && t.childCount == 0 && !t.GetComponent<Renderer>()) Object.DestroyImmediate(t.gameObject);
+
+            var path = $"{Dir}/Site{site}.prefab";
             PrefabUtility.SaveAsPrefabAsset(go, path);
             Object.DestroyImmediate(go);
-            AssetImporter.GetAtPath(path).assetBundleName = "site_" + site.ToString().ToLower();
         }
         AssetDatabase.SaveAssets();
     }
 
-    // glTF textures import uncompressed (RGBA32). Re-save each once as a jpg/png the importer can crunch.
-    static readonly System.Collections.Generic.Dictionary<Material, Material> mats = new();
-    static readonly System.Collections.Generic.Dictionary<Texture, Texture2D> texs = new();
-
-    static Material CompressedMaterial(Material m)
-    {
-        if (!m) return m;
-        if (mats.TryGetValue(m, out var done)) return done;
-        Directory.CreateDirectory(PrefabDir + "/Mat");
-        // Rebuild on URP Lit: the ripped glTF materials import as transparent (queue 3000), metallic and glowing.
-        var copy = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        var baseTex = m.HasProperty("baseColorTexture") ? m.GetTexture("baseColorTexture") : null;
-        var nrm = m.HasProperty("normalTexture") ? m.GetTexture("normalTexture") : null;
-        var em = m.HasProperty("emissiveTexture") ? m.GetTexture("emissiveTexture") : null;
-        string tn = m.name + " " + (baseTex ? baseTex.name : "");
-        // Tint by what the texture is, not by the object name (a "Wall" object can carry wood or brick).
-        string tx = baseTex ? baseTex.name : m.name;
-        Color tint = Color.white;
-        if (Has(tx, "Slate")) tint = new Color(1.7f, 1.65f, 1.58f);
-        else if (Has(tx, "Tile", "Stone", "Cobble", "Paver", "Concrete")) tint = new Color(1.2f, 1.16f, 1.1f);
-        else if (Has(tx, "Plaster", "Stucco")) tint = new Color(1f, 0.84f, 0.62f);
-        else if (Has(tx, "Brick")) tint = new Color(1.08f, 0.96f, 0.84f);
-        var bc = m.HasProperty("baseColorFactor") ? m.GetColor("baseColorFactor") : Color.white;
-        var col = bc * tint; col.a = 1f;
-        copy.SetColor("_BaseColor", col);
-        if (baseTex is Texture2D) copy.SetTexture("_BaseMap", CompressedTexture(baseTex, "baseColor"));
-        if (nrm is Texture2D) { copy.SetTexture("_BumpMap", CompressedTexture(nrm, "normal")); copy.EnableKeyword("_NORMALMAP"); }
-        copy.SetFloat("_Metallic", 0f);
-        copy.SetFloat("_Smoothness", Has(tn, "Glass", "Metal") ? 0.45f : 0.12f);
-        bool cutout = Has(tn, "Leaf", "Leaves", "Foliage", "Plant", "Tree", "Grass", "Vine", "Ivy", "Branch", "Decal", "Banner", "Flag", "Wires", "Cable");
-        if (cutout)
-        {
-            copy.SetFloat("_AlphaClip", 1f); copy.SetFloat("_Cutoff", 0.4f); copy.EnableKeyword("_ALPHATEST_ON");
-            copy.SetFloat("_Cull", 0f); copy.renderQueue = 2450;
-        }
-        else copy.renderQueue = 2000;
-        // Grime, stains and damage are overlay meshes: blend them over the wall instead of drawing them solid.
-        var bt = copy.GetTexture("_BaseMap");
-        bool hasAlpha = bt && AssetDatabase.GetAssetPath(bt).EndsWith(".png");
-        if (!cutout && hasAlpha && Has(tn, "Decal", "Grime", "Dirt", "Stain", "Leak", "Damage", "Destruct", "Overlay", "Wet", "Moss", "Dust", "Crack", "Puddle", "Soot", "Burn", "Paint", "Mural", "Graffiti", "Blend"))
-        {
-            copy.SetFloat("_Surface", 1f); copy.SetFloat("_Blend", 0f);
-            copy.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            copy.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            copy.SetFloat("_ZWrite", 0f);
-            copy.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            copy.SetOverrideTag("RenderType", "Transparent");
-            copy.renderQueue = 3000;
-            var c2 = copy.GetColor("_BaseColor"); c2.a = 1f; copy.SetColor("_BaseColor", c2);
-        }
-        bool glows = Has(tn, "RebelMetalCrates", "Glow", "Light", "Lamp", "Screen", "Emiss", "Neon", "Radianite", "Crystal");
-        if (glows && em is Texture2D)
-        {
-            copy.SetTexture("_EmissionMap", CompressedTexture(em, "emissive"));
-            copy.SetColor("_EmissionColor", Color.white * 1.6f);
-            copy.EnableKeyword("_EMISSION");
-            copy.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
-        }
-        var path = AssetDatabase.GenerateUniqueAssetPath($"{PrefabDir}/Mat/{San(m.name)}.mat");
-        AssetDatabase.CreateAsset(copy, path);
-        return mats[m] = copy;
-    }
-
-    static Texture2D CompressedTexture(Texture t, string prop)
-    {
-        if (texs.TryGetValue(t, out var done)) return done;
-        Directory.CreateDirectory(PrefabDir + "/Tex");
-        bool linear = !(prop.ToLower().Contains("base") || prop.ToLower().Contains("main") || prop.ToLower().Contains("emiss") || prop.ToLower().Contains("color"));
-        bool normal = prop.ToLower().Contains("normal") || prop.ToLower().Contains("bump");
-        int w = Mathf.Min(t.width, 512), h = Mathf.Min(t.height, 512);
-        var rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, linear ? RenderTextureReadWrite.Linear : RenderTextureReadWrite.sRGB);
-        Graphics.Blit(t, rt);
-        var prev = RenderTexture.active; RenderTexture.active = rt;
-        var tmp = new Texture2D(w, h, TextureFormat.RGBA32, false, linear);
-        tmp.ReadPixels(new Rect(0, 0, w, h), 0, 0); tmp.Apply();
-        RenderTexture.active = prev; RenderTexture.ReleaseTemporary(rt);
-        bool alpha = false;
-        foreach (var c in tmp.GetPixels32()) if (c.a < 250) { alpha = true; break; }
-        var path = AssetDatabase.GenerateUniqueAssetPath($"{PrefabDir}/Tex/{San(t.name)}.{(alpha ? "png" : "jpg")}");
-        File.WriteAllBytes(path, alpha ? tmp.EncodeToPNG() : tmp.EncodeToJPG(85));
-        Object.DestroyImmediate(tmp);
-        AssetDatabase.ImportAsset(path);
-        var imp = (TextureImporter)AssetImporter.GetAtPath(path);
-        imp.textureType = normal ? TextureImporterType.NormalMap : TextureImporterType.Default;
-        imp.sRGBTexture = !linear;
-        imp.maxTextureSize = 512;
-        imp.textureCompression = TextureImporterCompression.Compressed;
-        imp.crunchedCompression = true; imp.compressionQuality = 50;
-        imp.SaveAndReimport();
-        return texs[t] = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-    }
-
-    static bool Has(string s, params string[] keys) { foreach (var k in keys) if (s.IndexOf(k, System.StringComparison.OrdinalIgnoreCase) >= 0) return true; return false; }
-
-    static string San(string n) { foreach (var c in Path.GetInvalidFileNameChars()) n = n.Replace(c, '_'); return string.IsNullOrEmpty(n) ? "tex" : n; }
-
     [MenuItem("HavenDuel/Build Site Bundles (WebGL)")]
-    public static void BuildBundles() => BuildBundles(BuildTarget.WebGL);
+    public static void BuildBundlesWebGL() => BuildBundles(BuildTarget.WebGL);
 
     public static void BuildBundles(BuildTarget target)
     {
-        if (!File.Exists($"{PrefabDir}/SiteA.prefab")) BuildPrefabs();
+        if (!File.Exists($"{Dir}/SiteA.prefab")) BuildPrefabs();
         Directory.CreateDirectory(BundleDir);
-        var builds = System.Enum.GetValues(typeof(LanGame.Site)).Cast<LanGame.Site>().Select(s => new AssetBundleBuild
+        var builds = System.Enum.GetNames(typeof(Site)).Select(s => new AssetBundleBuild
         {
-            assetBundleName = "site_" + s.ToString().ToLower(),
-            assetNames = new[] { $"{PrefabDir}/Site{s}.prefab" },
+            assetBundleName = "site_" + s.ToLower(),
+            assetNames = new[] { $"{Dir}/Site{s}.prefab" },
         }).ToArray();
         BuildPipeline.BuildAssetBundles(BundleDir, builds, BuildAssetBundleOptions.ChunkBasedCompression, target);
         AssetDatabase.Refresh();
     }
+
+    static Material Convert(Material src)
+    {
+        if (!src) return src;
+        if (materials.TryGetValue(src, out var done)) return done;
+
+        var baseTex = src.HasProperty("baseColorTexture") ? src.GetTexture("baseColorTexture") : null;
+        var normal = src.HasProperty("normalTexture") ? src.GetTexture("normalTexture") : null;
+        var emissive = src.HasProperty("emissiveTexture") ? src.GetTexture("emissiveTexture") : null;
+        string names = src.name + " " + (baseTex ? baseTex.name : "");
+
+        var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+        var color = (src.HasProperty("baseColorFactor") ? src.GetColor("baseColorFactor") : Color.white) * Tint(baseTex ? baseTex.name : src.name);
+        color.a = 1f;
+        mat.SetColor("_BaseColor", color);
+        if (baseTex) mat.SetTexture("_BaseMap", Compress(baseTex, false, false));
+        if (normal)
+        {
+            mat.SetTexture("_BumpMap", Compress(normal, true, true));
+            mat.EnableKeyword("_NORMALMAP");
+        }
+        mat.SetFloat("_Metallic", 0f);
+        mat.SetFloat("_Smoothness", Has(names, "Glass", "Metal") ? 0.45f : 0.12f);
+        mat.renderQueue = 2000;
+
+        bool hasAlpha = baseTex && AssetDatabase.GetAssetPath(mat.GetTexture("_BaseMap")).EndsWith(".png");
+        if (Has(names, Cutout))
+        {
+            mat.SetFloat("_AlphaClip", 1f);
+            mat.SetFloat("_Cutoff", 0.4f);
+            mat.EnableKeyword("_ALPHATEST_ON");
+            mat.SetFloat("_Cull", 0f);
+            mat.renderQueue = 2450;
+        }
+        else if (hasAlpha && Has(names, Overlay))
+        {
+            mat.SetFloat("_Surface", 1f);
+            mat.SetFloat("_Blend", 0f);
+            mat.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+            mat.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+            mat.SetFloat("_ZWrite", 0f);
+            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            mat.SetOverrideTag("RenderType", "Transparent");
+            mat.renderQueue = 3000;
+        }
+        if (emissive && Has(names, Glow))
+        {
+            mat.SetTexture("_EmissionMap", Compress(emissive, false, false));
+            mat.SetColor("_EmissionColor", Color.white * 1.6f);
+            mat.EnableKeyword("_EMISSION");
+            mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+        }
+
+        AssetDatabase.CreateAsset(mat, AssetDatabase.GenerateUniqueAssetPath($"{Dir}/Mat/{FileName(src.name)}.mat"));
+        return materials[src] = mat;
+    }
+
+    static Color Tint(string texture)
+    {
+        if (Has(texture, "Slate")) return new Color(1.7f, 1.65f, 1.58f);
+        if (Has(texture, "Tile", "Stone", "Cobble", "Paver", "Concrete")) return new Color(1.2f, 1.16f, 1.1f);
+        if (Has(texture, "Plaster", "Stucco")) return new Color(1f, 0.84f, 0.62f);
+        if (Has(texture, "Brick")) return new Color(1.08f, 0.96f, 0.84f);
+        return Color.white;
+    }
+
+    static Texture2D Compress(Texture src, bool linear, bool isNormal)
+    {
+        if (textures.TryGetValue(src, out var done)) return done;
+        int w = Mathf.Min(src.width, 512), h = Mathf.Min(src.height, 512);
+        var rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32, linear ? RenderTextureReadWrite.Linear : RenderTextureReadWrite.sRGB);
+        Graphics.Blit(src, rt);
+        RenderTexture.active = rt;
+        var tex = new Texture2D(w, h, TextureFormat.RGBA32, false, linear);
+        tex.ReadPixels(new Rect(0, 0, w, h), 0, 0);
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(rt);
+
+        bool alpha = tex.GetPixels32().Any(c => c.a < 250);
+        var path = AssetDatabase.GenerateUniqueAssetPath($"{Dir}/Tex/{FileName(src.name)}.{(alpha ? "png" : "jpg")}");
+        File.WriteAllBytes(path, alpha ? tex.EncodeToPNG() : tex.EncodeToJPG(85));
+        Object.DestroyImmediate(tex);
+
+        AssetDatabase.ImportAsset(path);
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        importer.textureType = isNormal ? TextureImporterType.NormalMap : TextureImporterType.Default;
+        importer.sRGBTexture = !linear;
+        importer.maxTextureSize = 512;
+        importer.crunchedCompression = true;
+        importer.compressionQuality = 50;
+        importer.SaveAndReimport();
+        return textures[src] = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+    }
+
+    static bool Has(string s, params string[] words) =>
+        words.Any(w => s.IndexOf(w, System.StringComparison.OrdinalIgnoreCase) >= 0);
+
+    static string FileName(string name) =>
+        string.Concat(name.Select(c => Path.GetInvalidFileNameChars().Contains(c) ? '_' : c));
 }

@@ -54,3 +54,12 @@ Thumbs.db
 /Assets/Data/Sites/
 /Assets/Data/Sites.meta
 /Temp/
+
+# local AI tooling
+.agents/
+.claude/
+.huddle/
+
+/Screenshots/
+.wrangler/
+node_modules/

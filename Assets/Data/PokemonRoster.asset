@@ -14,44 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HavenDuel.Pokemon.PokemonRoster
   entries:
   - species: 0
-    model: {fileID: 2107409826236812522, guid: 45fb18104378e4790b5837b0f293d17b, type: 3}
-    height: 0.6
-    yawOffset: 0
-    hover: 0
-    runSpeed: 5
-  - species: 1
     model: {fileID: 8771091787928289351, guid: f35c7ee23e9abc35dba9d1b1a7d244f0, type: 3}
     height: 1.5
-    yawOffset: 0
-    hover: 0
     runSpeed: 6
-  - species: 2
+  - species: 1
     model: {fileID: 8128668236925612103, guid: f884e84059d6b42749da4c2c8e8830ef, type: 3}
     height: 2.2
-    yawOffset: 0
-    hover: 0
     runSpeed: 3
-  - species: 3
-    model: {fileID: 8128668236925612103, guid: d71f5016d1e734d69b930f132a6de4a4, type: 3}
-    height: 0.8
-    yawOffset: 0
-    hover: 0
-    runSpeed: 3
-  - species: 4
-    model: {fileID: 8771091787928289351, guid: 90bbaf7d838f09af087a2ad5d5117cc2, type: 3}
-    height: 0.55
-    yawOffset: 0
-    hover: 0
-    runSpeed: 5
-  - species: 5
-    model: {fileID: 8771091787928289351, guid: 09fda9f1139e0111c915f26ee9f9e28c, type: 3}
-    height: 0.55
-    yawOffset: 0
-    hover: 0.25
-    runSpeed: 99
-  - species: 6
-    model: {fileID: 8771091787928289351, guid: 79d6fb880de91b1afbd2cf640c9aa54a, type: 3}
-    height: 0.4
-    yawOffset: 0
-    hover: 0
-    runSpeed: 99

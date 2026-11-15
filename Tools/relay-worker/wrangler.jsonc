@@ -1,0 +1,8 @@
+{
+  "name": "haven-relay",
+  "account_id": "2bb02ccdca5a56fe188662418dfea916",
+  "main": "index.js",
+  "compatibility_date": "2026-09-01",
+  "durable_objects": { "bindings": [{ "name": "ROOM", "class_name": "Room" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }]
+}
