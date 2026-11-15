@@ -10,6 +10,7 @@ namespace HavenDuel.Pokemon
         Hit, Stun, Faint, Roar,
         FlyIdle, FlyBattleIdle, FlyMove, FlyFast, FlyAttack, FlySpecial, FlyHit, FlyLand,
         FlyChargeStart, FlyChargeLoop, FlyChargeEnd,
+        FaintLoop,
     }
 
     public enum Species { Pikachu, Greninja, Charizard, Bulbasaur, Eevee, Mimikyu, Ditto }

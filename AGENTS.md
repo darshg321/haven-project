@@ -31,6 +31,16 @@
 - Don't commit or push unless the user asks.
 - Close any Editor you opened when you finish (`unity close .`), unless the user wants it left open.
 
+## Fresh clone setup
+- **Install git-lfs and run `git lfs pull`.** Without it, the `.glb` models and the site bundles are only pointer files.
+- **Extract the site prefabs** with `tar xzf MapSource/site-data.tar.gz --skip-old-files`, which creates `Assets/Data/Sites` (gitignored). Their meshes need `haven_full.glb`, which isn't in the repo. So the game loads sites from the bundles in `StreamingAssets/sites` in both the Editor and the build, and in the Editor it swaps their WebGL shaders back to the Editor's own copies.
+- **Package Manager:** if it timed out on a slow network (for example glTFast), every `.glb` imports as a plain file. Run `UnityEditor.PackageManager.Client.Resolve()`.
+
+## Combat (Assets/Scripts/Combat)
+- **Run HavenDuel → Build Combat Assets** after you change `Assets/Editor/CombatSetup.cs`. It rebuilds the particle materials and prefabs in `Assets/Art/Generated`, the Teko TMP font, and `Assets/Data/CombatConfig.asset`.
+- **Assets come from the web, never generated.** List each new one in `Assets/Art/SOURCES.md`.
+- **Testing without a human:** set `LanGame.debugAutopilot = true` before joining. A Rookie brain then plays your Pokémon against the bot, so you can watch rounds, hits and KOs from the CLI.
+
 ## LAN multiplayer test
 - Scene `Assets/Scenes/LanTest.unity` (rebuild with **HavenDuel → Build LAN Test Scene**), first in the build list. Code in `Assets/Scripts/Net/`.
 - Relay: `python3 Tools/lan_server.py` (WebSocket :7777, also serves `builds/webgl` on :8000). Players on the same wifi open `http://<host LAN ip>:8000`.

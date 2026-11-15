@@ -40,7 +40,8 @@ namespace HavenDuel.Net
         readonly ClientWebSocket ws = new();
         readonly CancellationTokenSource cts = new();
         readonly ConcurrentQueue<string> inbox = new();
-        readonly SemaphoreSlim sendLock = new(1, 1);
+        readonly ConcurrentQueue<string> outbox = new();
+        readonly SemaphoreSlim outboxSignal = new(0);
         volatile State state = State.Connecting;
 
         public State Status => state;
@@ -51,13 +52,14 @@ namespace HavenDuel.Net
         {
             try
             {
-                await ws.ConnectAsync(new Uri(url), cts.Token);
+                await ws.ConnectAsync(new Uri(url), cts.Token).ConfigureAwait(false);
                 state = State.Open;
+                _ = SendLoop();
                 var buf = new byte[16 * 1024];
                 var sb = new StringBuilder();
                 while (ws.State == WebSocketState.Open)
                 {
-                    var r = await ws.ReceiveAsync(new ArraySegment<byte>(buf), cts.Token);
+                    var r = await ws.ReceiveAsync(new ArraySegment<byte>(buf), cts.Token).ConfigureAwait(false);
                     if (r.MessageType == WebSocketMessageType.Close) break;
                     sb.Append(Encoding.UTF8.GetString(buf, 0, r.Count));
                     if (r.EndOfMessage) { inbox.Enqueue(sb.ToString()); sb.Clear(); }
@@ -67,13 +69,27 @@ namespace HavenDuel.Net
             state = State.Closed;
         }
 
-        public async void Send(string msg)
+        /// Queued and sent from a background loop. Awaiting each send on Unity's main thread
+        /// managed about one message per frame, so in the Editor the queue (and the lag) grew without bound.
+        public void Send(string msg)
         {
             if (state != State.Open) return;
-            await sendLock.WaitAsync();
-            try { await ws.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text, true, cts.Token); }
+            outbox.Enqueue(msg);
+            outboxSignal.Release();
+        }
+
+        async Task SendLoop()
+        {
+            try
+            {
+                while (!cts.IsCancellationRequested && ws.State == WebSocketState.Open)
+                {
+                    await outboxSignal.WaitAsync(cts.Token).ConfigureAwait(false);
+                    if (!outbox.TryDequeue(out var msg)) continue;
+                    await ws.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text, true, cts.Token).ConfigureAwait(false);
+                }
+            }
             catch { }
-            finally { sendLock.Release(); }
         }
 
         public bool TryReceive(out string msg) => inbox.TryDequeue(out msg);

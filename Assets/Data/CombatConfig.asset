@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de585f9688febf97a89a647340f9842c, type: 3}
+  m_Name: CombatConfig
+  m_EditorClassIdentifier: Assembly-CSharp::HavenDuel.Combat.CombatConfig
+  fighters:
+  - species: 1
+    displayName: Greninja
+    maxHp: 100
+    height: 1.6
+    hitRadius: 0.38
+    basic:
+      name: Water Shuriken
+      damage: 7
+      speed: 42
+      gravity: 0
+      radius: 0.16
+      cooldown: 0.3
+      life: 2.2
+      visualScale: 1
+      animSpeed: 3.2
+      projectile: {fileID: 7353270765035485505, guid: 776723d2b7b163c7cb86f478066a19ee, type: 3}
+      hitFx: {fileID: 9211478357507781186, guid: 83300e2fcddbe39e58cd18150e7c0fe6, type: 3}
+      castSound: {fileID: 8300000, guid: 2a5798b16e575b4d88457bf89a7ced99, type: 3}
+      hitSound: {fileID: 8300000, guid: 1f35e8af5c8d5316a92bbc60aeda0139, type: 3}
+      wallSound: {fileID: 8300000, guid: 9f89ef17ecc0769b09227544799d505b, type: 3}
+      castVolume: 0.55
+    portrait: {fileID: 21300000, guid: 635bbef4b36570fd8bd2513964ebed02, type: 3}
+    cry: {fileID: 8300000, guid: 5d63856e67fa8d3b0b7401fcf8d1a5d4, type: 3}
+    color: {r: 0.3, g: 0.55, b: 0.95, a: 1}
+  - species: 2
+    displayName: Charizard
+    maxHp: 150
+    height: 2
+    hitRadius: 0.55
+    basic:
+      name: Ember
+      damage: 11
+      speed: 28
+      gravity: 2.5
+      radius: 0.22
+      cooldown: 0.5
+      life: 2.5
+      visualScale: 1
+      animSpeed: 3.5
+      projectile: {fileID: 2277004022919653254, guid: 595ded3bac454b377bba217a834607b7, type: 3}
+      hitFx: {fileID: 7398022153291507458, guid: 6811b1fc81be866baac719ea5f8323f2, type: 3}
+      castSound: {fileID: 8300000, guid: f64639a6455d64c1bae34215527ef0cc, type: 3}
+      hitSound: {fileID: 8300000, guid: 7d25e4d3f5cc88713ab7b276c2e8ea4d, type: 3}
+      wallSound: {fileID: 8300000, guid: 486a93b988b628ac893ec46f39cc3365, type: 3}
+      castVolume: 0.45
+    portrait: {fileID: 21300000, guid: 6ab35bbd666af4ded96deea3521d1fd3, type: 3}
+    cry: {fileID: 8300000, guid: 108ade888309451f7b2f123761b30130, type: 3}
+    color: {r: 0.95, g: 0.5, b: 0.2, a: 1}
+  roundTime: 120
+  countdown: 3
+  roundOverTime: 4.5
+  font: {fileID: 11400000, guid: 64fafbff0bdab394aa87a9fc63439feb, type: 2}
+  crosshair: {fileID: 21300000, guid: a82833691120a74cb979ebcf3a065c67, type: 3}
+  hitmarker: {fileID: 21300000, guid: 32b98ec7524769863a23a906be6870d3, type: 3}
+  panel: {fileID: 21300000, guid: 53554812cfaab9be98358e59d70fb98d, type: 3}
+  hitmarkerSound: {fileID: 8300000, guid: 91d3172ceddfd7666947e685459a4865, type: 3}
+  countdownSound: {fileID: 8300000, guid: 5c934f5cdc18ecd0eabfe25f34e93bce, type: 3}
+  fightSound: {fileID: 8300000, guid: 75d486009f8bf69dfa0dea84dbad1308, type: 3}
+  koSound: {fileID: 8300000, guid: 86fc65d11125c449a8c4fafb22c921cc, type: 3}
+  winSound: {fileID: 8300000, guid: c3d237ac1dc36caa68fc3e9783197c9a, type: 3}
+  loseSound: {fileID: 8300000, guid: 74724976e7d2eb19f98e0b457ed9b1c0, type: 3}

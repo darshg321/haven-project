@@ -262,6 +262,27 @@ The bots respect each Pokémon's movement profile, including Charizard flight pa
 | 3 | Pikachu, Eevee, Mimikyu, then Ditto last |
 | 4 | Stages, items, TMs, bot tiers |
 
+### Built so far (step A: one fight that works)
+This covers Greninja and Charizard only. Bulbasaur and the rest of the roster come later.
+- **Basic moves.** Both are skillshots with travel time.
+  - Greninja: **Water Shuriken**. 7 damage, 42 m/s, no drop, 0.3 s between throws.
+  - Charizard: **Ember**. 11 damage, 28 m/s, slight drop, 0.5 s between throws.
+  - There's no PP yet; that comes in step B.
+- **HP and hurtboxes.**
+  - Greninja: 100 HP, 1.6 m tall, 0.38 m hurtbox.
+  - Charizard: 150 HP, 2.0 m tall, 0.55 m hurtbox, so it's the big target.
+- **Round loop.**
+  - A 3 s countdown with movement frozen, then a 120 s fight.
+  - A round ends on a KO, or on time with the higher HP% winning (equal HP% is a draw).
+  - After a 4.5 s result screen the next round starts. Spawns swap sides every round, and wins are tallied with no match end yet. Best of 3 comes in step D.
+- **HUD.** Timer, score, both HP bars with portraits, crosshair, hitmarker (red on a KO), damage numbers, a damage flash, round banners, Charizard's wing stamina, and a click-to-play overlay.
+- **Rookie bot.**
+  - Aims at your current position without leading, with a little aim wobble and hesitation between throws.
+  - Dodges incoming shots after a 0.22–0.4 s reaction.
+  - Strafes when it can see you, and otherwise finds you along a NavMesh built from the site when the round loads.
+- **Online.** The relay host (the lowest player id) runs the rounds. Each player owns their own HP, and the shooter reports hits.
+- All tunables live in `Assets/Data/CombatConfig.asset`, which **HavenDuel → Build Combat Assets** rebuilds. Assets are downloaded from the web, never generated; sources and licenses are in `Assets/Art/SOURCES.md`.
+
 **Risks:**
 - Charizard's flight balance
 - slow Pokémon may not feel fun to play

@@ -29,3 +29,25 @@ Plan: one scene with both maps (Site C low poly object + full Haven), start menu
 - 23:20 user: fix translucency, vibrant colors, shader issues, crates not filled (green glow panels), Site A includes def spawn + part of B. Plan: URP/Lit opaque materials in SiteBundles, emissive for glow panels, center-in-region cut, tighter AreaA.
 - 23:30 done: URP Lit opaque rebuild in SiteBundles.CompressedMaterial (cutout for foliage, emission for RebelMetalCrates/Glow/Light/Screen), center-in-area cut margin 3, AreaA -105..-44 x -116..-50, saturation 18 contrast 10. Bundles A 27MB B 36MB C 31MB. Next: review Temp/lookA5.png (crate at -73,4,-101), report; user said 'fix everything make no mistakes'.
 - 23:50: re-exported glb (drop only sky/vista/blockers/gravel/wires/cable; decimate only trees/foliage/rocks 0.35). Crates fixed (Meteor_0_BoxA/B were dropped before). Tint by texture name; Slate x1.7 but A floor (Tile_M1_BrickPatternSlate) still dark. Walk test: A,C 0 overlaps; B 4 of 8 runs overlaps=1 -> investigate. Bundles A 36 B 46 C 42 MB. Still pending: dark slate floors, B overlap, itch build+upload+2-tab test.
+
+## Step A: Greninja vs Charizard fight (new branch)
+- **Asked for:** step A of the plan, with Greninja and Charizard only. Use web assets and never generate any (licensing is handled later).
+- **Done:**
+  - Code in `Assets/Scripts/Combat/`:
+    - `PokemonMotor`: movement, moved out of `LanGame`.
+    - `Fighter`: HP, hurtbox and the basic move.
+    - `Projectile`.
+    - `RoundManager`: countdown, 120 s, KO or HP%, result screen, side swap.
+    - `BotBrain`: the Rookie bot, using a runtime NavMesh.
+    - `Hud`: uGUI and TMP.
+    - `Sfx`.
+  - `CombatConfig` holds the tunables.
+  - The start screen has an Opponent choice: Bot Greninja, Bot Charizard, or Online.
+- **Verified in Play mode:**
+  - Bot against autopilot on Sites C and A: rounds, KOs, score and spawn swaps all work.
+  - Online through `lan_server.py` with a Python stand-in client: hits, KO, the next round starting at full HP, and a host handover.
+  - Fixed the desktop/Editor `LanSocket` send backlog, which had caused lag of more than 20 s.
+- **Not done:**
+  - A WebGL build and a test with two real browser tabs.
+  - Balance: Greninja beats Charizard in Rookie-against-Rookie fights. Revisit it with humans, and again when PP lands in step B.
+  - Next is step B (PP economy).

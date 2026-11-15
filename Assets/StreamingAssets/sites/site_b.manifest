@@ -1,3 +1,37 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:dd991d9655ab7fb706dcd2f9c989603a6479c10277a680f177419b7564b40490
-size 799
+ManifestFileVersion: 0
+UnityVersion: 6000.3.28f1
+CRC: 3249605628
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: cb84d354d415179d268eca6e3af891e5
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: d99326e414537f318fb2bd6e0ee8e731
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: b1b195d14d8274a140971b8c690ede2d
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 64
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Data/Sites/SiteB.prefab
+Dependencies: []

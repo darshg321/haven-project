@@ -23,6 +23,7 @@ namespace HavenDuel.Pokemon
         string current;
         string oneShot;
         float oneShotEnd;
+        PokemonAnim? hold;
         bool wasGrounded = true;
 
         public bool IsPlayingAction => oneShot != null;
@@ -44,6 +45,10 @@ namespace HavenDuel.Pokemon
 
         public bool Has(PokemonAnim a) => clipNames.ContainsKey(a);
 
+        /// After the current one-shot, stay in this state instead of going back to locomotion
+        /// (a fainted Pokemon stays down). Null hands control back to locomotion.
+        public void HoldAfterAction(PokemonAnim? state) => hold = state;
+
         /// Call every frame from the controller (or bot) with the body's current state.
         public void UpdateLocomotion(Vector3 velocity, bool grounded, bool flying = false)
         {
@@ -53,6 +58,7 @@ namespace HavenDuel.Pokemon
                 if (Time.time < oneShotEnd && anim.IsPlaying(oneShot)) return;
                 oneShot = null;
             }
+            if (hold != null) { Play(hold.Value); return; }
 
             float ground = new Vector2(velocity.x, velocity.z).magnitude;
             PokemonAnim want;
@@ -125,6 +131,7 @@ namespace HavenDuel.Pokemon
                     PokemonAnim.FlyChargeStart => PokemonAnim.ChargeStart,
                     PokemonAnim.FlyChargeLoop => PokemonAnim.ChargeLoop,
                     PokemonAnim.FlyChargeEnd => PokemonAnim.ChargeEnd,
+                    PokemonAnim.FaintLoop => PokemonAnim.Faint,
                     _ => null,
                 };
                 if (next == null) return null;

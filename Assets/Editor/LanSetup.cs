@@ -93,6 +93,7 @@ public static class LanSetup
         Look(sun);
         var game = new GameObject("LanGame").AddComponent<LanGame>();
         game.roster = roster;
+        game.combat = AssetDatabase.LoadAssetAtPath<HavenDuel.Combat.CombatConfig>("Assets/Data/CombatConfig.asset");
         game.map = map ? map.transform : null;
         game.floorPrefix = floorPrefix;
         EditorSceneManager.SaveScene(scene, scenePath);
